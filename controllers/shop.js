@@ -1,5 +1,4 @@
 const Product = require('../models/product');
-const Order = require('../models/order');
 
 exports.getProducts = (req, res, next) => {
   Product.find()
@@ -16,6 +15,19 @@ exports.getProducts = (req, res, next) => {
     });
 };
 
+exports.getProduct = (req, res, next) => {
+  const prodId = req.params.productId;
+  Product.findById(prodId)
+    .then(product => {
+      res.render('shop/product-detail', {
+        product: product,
+        pageTitle: product.title,
+        path: '/products'
+      });
+    })
+    .catch(err => console.log(err));
+};
+
 exports.getIndex = (req, res, next) => {
   Product.find()
     .then(products => {
@@ -30,16 +42,30 @@ exports.getIndex = (req, res, next) => {
     });
 };
 
-exports.getProduct = (req, res, next) => {
-  const prodId = req.params.productId;
-  Product.findById(prodId)
-    .then(product => {
-      res.render('shop/product-detail', {
-        product: product,
-        pageTitle: product.title,
-        path: '/products',
-        isAuthenticated: req.session.isLoggedIn
+exports.getCart = (req, res, next) => {
+  req.user
+    .populate('cart.items.productId')
+    .execPopulate()
+    .then(user => {
+      const products = user.cart.items;
+      res.render('shop/cart', {
+        path: '/cart',
+        pageTitle: 'Your Cart',
+        products: products
       });
     })
     .catch(err => console.log(err));
 };
+
+exports.postCart = (req, res, next) => {
+  const prodId = req.body.productId;
+  Product.findById(prodId)
+    .then(product => {
+      return req.user.addToCart(product);
+    })
+    .then(result => {
+      console.log(result);
+      res.redirect('/cart');
+    });
+};
+
