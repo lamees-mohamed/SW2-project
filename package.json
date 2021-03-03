@@ -31,7 +31,7 @@
     "mongoose": "^5.9.2",
     "nodemailer": "^6.4.6",
     "nodemailer-sendgrid-transport": "^0.2.0",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "save": "^2.4.0",
     "update-mongo": "0.0.4"
   }
